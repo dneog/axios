@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form id="form" action="">
+        <label for="">Name</label>
+        <input type="text" name="name" id="name" autocomplete="off">
+        <label for="">Email-ID</label>
+        <input type="email" name="email" id="email" autocomplete="off">
+        <label for="">Phone Number</label>
+        <input type="text" name="phoneNumber" id="phoneNumber" autocomplete="off">
+        <input type="submit" name="submit" id="submit">
+        </form>
+        <ul id="ullist"></ul>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
+        <script>
+            let submitbtn=document.getElementById("submit");
+let ul=document.getElementById("ullist");
+
+submitbtn.addEventListener("click", StoreData);
+
+function StoreData(event){
+    event.preventDefault();
+   
+     let name=document.getElementById("name").value;
+     let email=document.getElementById("email").value;
+     let phoneNumber=document.getElementById("phoneNumber").value;
+     let combine=`${name} - ${email} - ${phoneNumber}`;
+     let li=document.createElement("li");
+     let text=document.createTextNode(combine);
+   
+     let myObj={
+         name,
+         email,
+         phoneNumber
+      }
+          axios.post('https://crudcrud.com/api/ed244bfd01fc482c95c6b61178b2ef56/data', myObj)
+          .then((response)=>{
+            display(response.data);
+          }
+          );
+}
+
+window.addEventListener("DOMContentLoaded",()=>{
+      axios.get(`https://crudcrud.com/api/ed244bfd01fc482c95c6b61178b2ef56/data`)
+            .then((response)=>{
+               for(let i=0;i<response.data.length;i++){
+                console.log(response.data[i]);
+                  display(response.data[i]);
+               }
+            }); 
+})
+
+function display(respons){
+    let li =document.createElement("li");
+    li.textContent = respons.name +" -" + respons.email +" -" + respons.phoneNumber;
+   
+
+
+
+    let deletebtn = document.createElement("input");
+    deletebtn.type = "button";
+    deletebtn.value = "Delete";
+    li.appendChild(deletebtn);
+    
+    deletebtn.onclick =()=>{
+      deleteUser(`${respons._id}`);
+    } 
+    
+    function deleteUser(userId){
+         axios.delete(`https://crudcrud.com/api/ed244bfd01fc482c95c6b61178b2ef56/data/${userId}`)
+              .then((res)=>{
+                ul.removeChild(li);
+              })
+      }
+
+    let editbtn = document.createElement("input");
+    editbtn.type = "button";
+    editbtn.value = "Edit";
+    li.appendChild(editbtn);
+    ul.appendChild(li);
+
+    editbtn.onclick =()=>{
+        editUser(`${respons._id}`);
+
+    }
+
+    function editUser(userid){
+      axios.delete(`https://crudcrud.com/api/ed244bfd01fc482c95c6b61178b2ef56/data/${userid}`)
+           .then((res)=>{
+             ul.removeChild(li);
+            document.getElementById("name").value = respons.name;
+            document.getElementById("email").value = respons.email;
+            document.getElementById("phoneNumber").value = respons.phoneNumber;
+           })
+           .catch((err)=>{
+            console.log(err);
+           })
+     
+    }
+
+  }
+        </script>
+</body>
+</html>
